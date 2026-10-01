@@ -41,3 +41,10 @@ export function formatDisplayDate(iso: string, locale = 'tr-TR'): string {
     year: 'numeric',
   });
 }
+
+export function formatShortDate(iso: string, locale = 'tr-TR'): string {
+  return fromISODate(iso).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'long',
+  });
+}

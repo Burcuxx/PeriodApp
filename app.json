@@ -25,10 +25,11 @@
       [
         "expo-notifications",
         {
-          "color": "#B565A7"
+          "color": "#7E2F72"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ]
   }
 }
