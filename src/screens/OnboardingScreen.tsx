@@ -8,19 +8,15 @@ import { useAppData } from '../context/AppContext';
 import { colors, radius, spacing, typography } from '../theme/theme';
 import { todayISO } from '../utils/date';
 import { OptionChips } from '../components/OptionChips';
+import { useI18n } from '../i18n';
 
-const CYCLE_LENGTH_OPTIONS = [21, 24, 26, 28, 30, 32, 35].map((n) => ({
-  value: String(n),
-  label: `${n} gün`,
-}));
-
-const PERIOD_LENGTH_OPTIONS = [2, 3, 4, 5, 6, 7, 8].map((n) => ({
-  value: String(n),
-  label: `${n} gün`,
-}));
+const CYCLE_LENGTHS = [21, 24, 26, 28, 30, 32, 35];
+const PERIOD_LENGTHS = [2, 3, 4, 5, 6, 7, 8];
 
 export function OnboardingScreen() {
   const { completeOnboarding } = useAppData();
+  const { t, language } = useI18n();
+  const toOption = (n: number) => ({ value: String(n), label: t.common.days(n) });
   const [lastPeriodStart, setLastPeriodStart] = useState<string>(todayISO());
   const [cycleLength, setCycleLength] = useState('28');
   const [periodLength, setPeriodLength] = useState('5');
@@ -35,14 +31,15 @@ export function OnboardingScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={typography.title}>Hoş geldin 🌸</Text>
+        <Text style={typography.title}>{t.onboarding.title}</Text>
         <Text style={[typography.bodyMuted, styles.subtitle]}>
-          Döngünü doğru tahmin edebilmemiz için birkaç bilgiye ihtiyacımız var.
+          {t.onboarding.subtitle}
         </Text>
 
         <Card style={styles.card}>
-          <Text style={typography.heading}>Son adet başlangıç tarihin</Text>
+          <Text style={typography.heading}>{t.onboarding.lastPeriodStart}</Text>
           <Calendar
+            key={language}
             current={lastPeriodStart}
             maxDate={todayISO()}
             onDayPress={(day) => setLastPeriodStart(day.dateString)}
@@ -58,23 +55,23 @@ export function OnboardingScreen() {
         </Card>
 
         <Card style={styles.card}>
-          <Text style={typography.heading}>Ortalama döngü uzunluğun</Text>
+          <Text style={typography.heading}>{t.onboarding.cycleLength}</Text>
           <Text style={[typography.bodyMuted, styles.hint]}>
-            Bir adet başlangıcından diğerine kaç gün geçiyor?
+            {t.onboarding.cycleLengthHint}
           </Text>
-          <OptionChips options={CYCLE_LENGTH_OPTIONS} selected={cycleLength} onSelect={setCycleLength} />
+          <OptionChips options={CYCLE_LENGTHS.map(toOption)} selected={cycleLength} onSelect={setCycleLength} />
         </Card>
 
         <Card style={styles.card}>
-          <Text style={typography.heading}>Adet dönemin genelde kaç gün sürüyor?</Text>
+          <Text style={typography.heading}>{t.onboarding.periodLength}</Text>
           <OptionChips
-            options={PERIOD_LENGTH_OPTIONS}
+            options={PERIOD_LENGTHS.map(toOption)}
             selected={periodLength}
             onSelect={setPeriodLength}
           />
         </Card>
 
-        <Button label="Başla" onPress={handleSubmit} disabled={submitting} style={styles.submit} />
+        <Button label={t.onboarding.start} onPress={handleSubmit} disabled={submitting} style={styles.submit} />
       </ScrollView>
     </SafeAreaView>
   );

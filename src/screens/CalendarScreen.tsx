@@ -7,10 +7,12 @@ import { DayDetailModal } from '../components/DayDetailModal';
 import { useAppData } from '../context/AppContext';
 import { colors, radius, spacing, typography } from '../theme/theme';
 import { buildMarkedDates } from '../utils/calendarMarks';
-import { diffInDays, formatDisplayDate, todayISO } from '../utils/date';
+import { useI18n } from '../i18n';
+import { diffInDays, todayISO } from '../utils/date';
 
 export function CalendarScreen() {
   const { periodDays, prediction } = useAppData();
+  const { t, language, formatDate } = useI18n();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const markedDates = useMemo(
@@ -25,35 +27,36 @@ export function CalendarScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={typography.title}>Döngüm</Text>
+        <Text style={typography.title}>{t.calendar.title}</Text>
 
         <Card style={styles.summaryCard}>
           {prediction.currentCycleDay !== null && (
-            <Text style={typography.heading}>Döngü günü: {prediction.currentCycleDay}</Text>
+            <Text style={typography.heading}>{t.calendar.cycleDay(prediction.currentCycleDay)}</Text>
           )}
           {daysUntilNextPeriod !== null && (
             <Text style={typography.bodyMuted}>
               {daysUntilNextPeriod > 0
-                ? `Tahmini adete ${daysUntilNextPeriod} gün var`
+                ? t.calendar.daysUntilPeriod(daysUntilNextPeriod)
                 : daysUntilNextPeriod === 0
-                ? 'Adetin bugün başlayabilir'
-                : 'Adet tahmini tarihi geçti, döngünü güncelle'}
+                ? t.calendar.periodMayStartToday
+                : t.calendar.predictionPassed}
             </Text>
           )}
           {prediction.nextPeriodStart && (
             <Text style={typography.bodyMuted}>
-              Sonraki adet: {formatDisplayDate(prediction.nextPeriodStart)}
+              {t.calendar.nextPeriod(formatDate(prediction.nextPeriodStart))}
             </Text>
           )}
           {prediction.ovulationDate && (
             <Text style={typography.bodyMuted}>
-              Tahmini yumurtlama: {formatDisplayDate(prediction.ovulationDate)}
+              {t.calendar.predictedOvulation(formatDate(prediction.ovulationDate))}
             </Text>
           )}
         </Card>
 
         <Card style={styles.calendarCard}>
           <Calendar
+            key={language}
             markingType="multi-period"
             markedDates={markedDates}
             onDayPress={(day) => setSelectedDate(day.dateString)}
@@ -63,10 +66,10 @@ export function CalendarScreen() {
         </Card>
 
         <Card style={styles.legendCard}>
-          <LegendRow color={colors.periodDay} label="Adet günü" />
-          <LegendRow color={colors.predictedPeriod} label="Tahmini adet" />
-          <LegendRow color={colors.fertileWindow} label="Doğurgan pencere" />
-          <LegendRow color={colors.ovulation} label="Tahmini yumurtlama" />
+          <LegendRow color={colors.periodDay} label={t.calendar.legendPeriodDay} />
+          <LegendRow color={colors.predictedPeriod} label={t.calendar.legendPredictedPeriod} />
+          <LegendRow color={colors.fertileWindow} label={t.calendar.legendFertileWindow} />
+          <LegendRow color={colors.ovulation} label={t.calendar.legendOvulation} />
         </Card>
       </ScrollView>
 

@@ -18,11 +18,14 @@ export interface PeriodGroup {
   length: number; // number of days in this period
 }
 
+export type LanguagePreference = 'system' | 'en' | 'tr' | 'fr' | 'de';
+
 export interface UserSettings {
   onboardingComplete: boolean;
   averageCycleLength: number; // days between period start dates
   averagePeriodLength: number; // days a period typically lasts
   notificationsEnabled: boolean;
+  language: LanguagePreference;
 }
 
 export interface CyclePrediction {

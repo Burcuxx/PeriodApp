@@ -7,17 +7,19 @@ import { StatisticsScreen } from '../screens/StatisticsScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 import { useAppData } from '../context/AppContext';
+import { useI18n } from '../i18n';
 import { colors } from '../theme/theme';
 
 const Tab = createBottomTabNavigator();
 
 const TAB_ICONS: Record<string, string> = {
-  Takvim: '📅',
-  İstatistik: '📊',
-  Ayarlar: '⚙️',
+  Calendar: '📅',
+  Statistics: '📊',
+  Settings: '⚙️',
 };
 
 function MainTabs() {
+  const { t } = useI18n();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -28,9 +30,9 @@ function MainTabs() {
         tabBarIcon: () => <Text style={{ fontSize: 20 }}>{TAB_ICONS[route.name]}</Text>,
       })}
     >
-      <Tab.Screen name="Takvim" component={CalendarScreen} />
-      <Tab.Screen name="İstatistik" component={StatisticsScreen} />
-      <Tab.Screen name="Ayarlar" component={SettingsScreen} />
+      <Tab.Screen name="Calendar" component={CalendarScreen} options={{ title: t.tabs.calendar }} />
+      <Tab.Screen name="Statistics" component={StatisticsScreen} options={{ title: t.tabs.statistics }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: t.tabs.settings }} />
     </Tab.Navigator>
   );
 }

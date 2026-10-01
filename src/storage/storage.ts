@@ -12,6 +12,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
   averageCycleLength: 28,
   averagePeriodLength: 5,
   notificationsEnabled: true,
+  language: 'system',
 };
 
 async function readJSON<T>(key: string, fallback: T): Promise<T> {
@@ -45,7 +46,9 @@ export async function saveSymptoms(symptoms: Record<string, SymptomLog>): Promis
 }
 
 export async function loadSettings(): Promise<UserSettings> {
-  return readJSON<UserSettings>(KEYS.settings, DEFAULT_SETTINGS);
+  // Merge with defaults so settings saved by older versions pick up new fields.
+  const saved = await readJSON<Partial<UserSettings>>(KEYS.settings, {});
+  return { ...DEFAULT_SETTINGS, ...saved };
 }
 
 export async function saveSettings(settings: UserSettings): Promise<void> {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Rect, Text as SvgText } from 'react-native-svg';
+import { useI18n } from '../i18n';
 import { colors, radius, spacing, typography } from '../theme/theme';
 
 interface CycleBarChartProps {
@@ -13,12 +14,11 @@ const BAR_WIDTH = 28;
 const BAR_GAP = 16;
 
 export function CycleBarChart({ values, average }: CycleBarChartProps) {
+  const { t } = useI18n();
   if (values.length === 0) {
     return (
       <View style={styles.empty}>
-        <Text style={typography.bodyMuted}>
-          Henüz yeterli veri yok. Birden fazla döngü kaydettiğinde burada geçmişini göreceksin.
-        </Text>
+        <Text style={typography.bodyMuted}>{t.statistics.notEnoughData}</Text>
       </View>
     );
   }

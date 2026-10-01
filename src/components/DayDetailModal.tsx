@@ -3,32 +3,13 @@ import { Modal, ScrollView, StyleSheet, Text, TextInput, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAppData } from '../context/AppContext';
 import { colors, radius, spacing, typography } from '../theme/theme';
-import { formatDisplayDate } from '../utils/date';
+import { useI18n } from '../i18n';
 import { CrampSeverity, FlowIntensity, MoodType } from '../types';
 import { Button } from './Button';
 import { OptionChips } from './OptionChips';
 
-const MOOD_OPTIONS: { value: MoodType; label: string }[] = [
-  { value: 'happy', label: '😊 Mutlu' },
-  { value: 'calm', label: '😌 Sakin' },
-  { value: 'energetic', label: '⚡ Enerjik' },
-  { value: 'sad', label: '😢 Üzgün' },
-  { value: 'irritable', label: '😠 Sinirli' },
-  { value: 'anxious', label: '😰 Kaygılı' },
-];
-
-const FLOW_OPTIONS: { value: FlowIntensity; label: string }[] = [
-  { value: 'light', label: 'Hafif' },
-  { value: 'medium', label: 'Orta' },
-  { value: 'heavy', label: 'Yoğun' },
-];
-
-const CRAMP_OPTIONS: { value: string; label: string }[] = [
-  { value: '0', label: 'Yok' },
-  { value: '1', label: 'Hafif' },
-  { value: '2', label: 'Orta' },
-  { value: '3', label: 'Şiddetli' },
-];
+const MOODS: MoodType[] = ['happy', 'calm', 'energetic', 'sad', 'irritable', 'anxious'];
+const FLOWS: FlowIntensity[] = ['light', 'medium', 'heavy'];
 
 interface DayDetailModalProps {
   date: string | null;
@@ -37,6 +18,7 @@ interface DayDetailModalProps {
 
 export function DayDetailModal({ date, onClose }: DayDetailModalProps) {
   const { periodDays, symptoms, togglePeriodDay, upsertSymptomLog } = useAppData();
+  const { t, formatDate } = useI18n();
   const [mood, setMood] = useState<MoodType | undefined>(undefined);
   const [flow, setFlow] = useState<FlowIntensity | undefined>(undefined);
   const [cramp, setCramp] = useState<string | undefined>(undefined);
@@ -54,6 +36,9 @@ export function DayDetailModal({ date, onClose }: DayDetailModalProps) {
   if (!date) return null;
 
   const isPeriodDay = periodDays.includes(date);
+  const moodOptions = MOODS.map((value) => ({ value, label: t.dayDetail.moods[value] }));
+  const flowOptions = FLOWS.map((value) => ({ value, label: t.dayDetail.flowLevels[value] }));
+  const crampOptions = t.dayDetail.crampLevels.map((label, i) => ({ value: String(i), label }));
 
   const handleSave = async () => {
     await upsertSymptomLog(date, {
@@ -69,37 +54,37 @@ export function DayDetailModal({ date, onClose }: DayDetailModalProps) {
     <Modal visible animationType="slide" onRequestClose={onClose} transparent={false}>
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={typography.title}>{formatDisplayDate(date)}</Text>
+          <Text style={typography.title}>{formatDate(date)}</Text>
 
           <View style={styles.section}>
             <Button
-              label={isPeriodDay ? 'Adet günü olarak işaretlendi ✕' : 'Adet günü olarak işaretle'}
+              label={isPeriodDay ? t.dayDetail.markedAsPeriod : t.dayDetail.markAsPeriod}
               variant={isPeriodDay ? 'primary' : 'outline'}
               onPress={() => togglePeriodDay(date)}
             />
           </View>
 
           <View style={styles.section}>
-            <Text style={typography.heading}>Ruh hali</Text>
-            <OptionChips options={MOOD_OPTIONS} selected={mood} onSelect={setMood} />
+            <Text style={typography.heading}>{t.dayDetail.mood}</Text>
+            <OptionChips options={moodOptions} selected={mood} onSelect={setMood} />
           </View>
 
           <View style={styles.section}>
-            <Text style={typography.heading}>Akış yoğunluğu</Text>
-            <OptionChips options={FLOW_OPTIONS} selected={flow} onSelect={setFlow} />
+            <Text style={typography.heading}>{t.dayDetail.flow}</Text>
+            <OptionChips options={flowOptions} selected={flow} onSelect={setFlow} />
           </View>
 
           <View style={styles.section}>
-            <Text style={typography.heading}>Kramp şiddeti</Text>
-            <OptionChips options={CRAMP_OPTIONS} selected={cramp} onSelect={setCramp} />
+            <Text style={typography.heading}>{t.dayDetail.cramps}</Text>
+            <OptionChips options={crampOptions} selected={cramp} onSelect={setCramp} />
           </View>
 
           <View style={styles.section}>
-            <Text style={typography.heading}>Notlar</Text>
+            <Text style={typography.heading}>{t.dayDetail.notes}</Text>
             <TextInput
               value={notes}
               onChangeText={setNotes}
-              placeholder="Bugün nasıl hissettiğini yaz..."
+              placeholder={t.dayDetail.notesPlaceholder}
               placeholderTextColor={colors.textMuted}
               style={styles.notesInput}
               multiline
@@ -107,8 +92,8 @@ export function DayDetailModal({ date, onClose }: DayDetailModalProps) {
           </View>
 
           <View style={styles.actions}>
-            <Button label="Kaydet" onPress={handleSave} style={styles.actionButton} />
-            <Button label="Kapat" variant="outline" onPress={onClose} style={styles.actionButton} />
+            <Button label={t.common.save} onPress={handleSave} style={styles.actionButton} />
+            <Button label={t.common.close} variant="outline" onPress={onClose} style={styles.actionButton} />
           </View>
         </ScrollView>
       </SafeAreaView>

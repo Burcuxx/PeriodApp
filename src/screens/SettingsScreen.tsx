@@ -4,21 +4,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../components/Card';
 import { OptionChips } from '../components/OptionChips';
 import { useAppData } from '../context/AppContext';
+import { LANGUAGE_NAMES, SUPPORTED_LANGUAGES, useI18n } from '../i18n';
+import { LanguagePreference } from '../types';
 import { colors, spacing, typography } from '../theme/theme';
 import { requestNotificationPermissions } from '../utils/notifications';
 
-const CYCLE_LENGTH_OPTIONS = [21, 24, 26, 28, 30, 32, 35].map((n) => ({
-  value: String(n),
-  label: `${n} gün`,
-}));
-
-const PERIOD_LENGTH_OPTIONS = [2, 3, 4, 5, 6, 7, 8].map((n) => ({
-  value: String(n),
-  label: `${n} gün`,
-}));
+const CYCLE_LENGTHS = [21, 24, 26, 28, 30, 32, 35];
+const PERIOD_LENGTHS = [2, 3, 4, 5, 6, 7, 8];
 
 export function SettingsScreen() {
   const { settings, updateSettings } = useAppData();
+  const { t } = useI18n();
+  const toOption = (n: number) => ({ value: String(n), label: t.common.days(n) });
+  const languageOptions: { value: LanguagePreference; label: string }[] = [
+    { value: 'system', label: t.settings.systemLanguage },
+    ...SUPPORTED_LANGUAGES.map((value) => ({ value, label: LANGUAGE_NAMES[value] })),
+  ];
 
   const handleToggleNotifications = async (value: boolean) => {
     if (value) {
@@ -31,15 +32,22 @@ export function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={typography.title}>Ayarlar</Text>
+        <Text style={typography.title}>{t.settings.title}</Text>
+
+        <Card style={styles.card}>
+          <Text style={typography.heading}>{t.settings.language}</Text>
+          <OptionChips
+            options={languageOptions}
+            selected={settings.language}
+            onSelect={(value) => updateSettings({ language: value })}
+          />
+        </Card>
 
         <Card style={styles.card}>
           <View style={styles.row}>
             <View style={styles.rowText}>
-              <Text style={typography.heading}>Bildirimler</Text>
-              <Text style={typography.bodyMuted}>
-                Yaklaşan adet ve yumurtlama dönemi için hatırlatma al
-              </Text>
+              <Text style={typography.heading}>{t.settings.notifications}</Text>
+              <Text style={typography.bodyMuted}>{t.settings.notificationsHint}</Text>
             </View>
             <Switch
               value={settings.notificationsEnabled}
@@ -51,26 +59,25 @@ export function SettingsScreen() {
         </Card>
 
         <Card style={styles.card}>
-          <Text style={typography.heading}>Ortalama döngü uzunluğu</Text>
+          <Text style={typography.heading}>{t.settings.avgCycleLength}</Text>
           <OptionChips
-            options={CYCLE_LENGTH_OPTIONS}
+            options={CYCLE_LENGTHS.map(toOption)}
             selected={String(settings.averageCycleLength)}
             onSelect={(value) => updateSettings({ averageCycleLength: Number(value) })}
           />
         </Card>
 
         <Card style={styles.card}>
-          <Text style={typography.heading}>Ortalama adet süresi</Text>
+          <Text style={typography.heading}>{t.settings.avgPeriodLength}</Text>
           <OptionChips
-            options={PERIOD_LENGTH_OPTIONS}
+            options={PERIOD_LENGTHS.map(toOption)}
             selected={String(settings.averagePeriodLength)}
             onSelect={(value) => updateSettings({ averagePeriodLength: Number(value) })}
           />
         </Card>
 
         <Text style={[typography.caption, styles.footnote]}>
-          Bu bilgiler, sen yeterli döngü geçmişi kaydedene kadar tahminlerde başlangıç noktası olarak
-          kullanılır.
+          {t.settings.footnote}
         </Text>
       </ScrollView>
     </SafeAreaView>

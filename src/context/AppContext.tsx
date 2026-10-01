@@ -15,6 +15,8 @@ import {
   saveSettings,
   saveSymptoms,
 } from '../storage/storage';
+import { useLocales } from 'expo-localization';
+import { getTranslations, resolveLanguage } from '../i18n/languages';
 import { CyclePrediction, SymptomLog, UserSettings } from '../types';
 import { predictCycle } from '../utils/cyclePredictor';
 import { addDaysISO } from '../utils/date';
@@ -59,14 +61,19 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const prediction = useMemo(() => predictCycle(periodDays, settings), [periodDays, settings]);
 
+  const deviceLocales = useLocales();
+  const language = resolveLanguage(settings.language, deviceLocales);
+
   useEffect(() => {
     if (loading) return;
     if (settings.notificationsEnabled) {
-      scheduleCycleNotifications(prediction).catch(() => undefined);
+      scheduleCycleNotifications(prediction, getTranslations(language).notifications).catch(
+        () => undefined
+      );
     } else {
       cancelAllCycleNotifications().catch(() => undefined);
     }
-  }, [loading, prediction, settings.notificationsEnabled]);
+  }, [loading, prediction, settings.notificationsEnabled, language]);
 
   const togglePeriodDay = useCallback(async (date: string) => {
     setPeriodDays((prev) => {

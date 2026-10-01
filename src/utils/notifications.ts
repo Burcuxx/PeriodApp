@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { Translations } from '../i18n/translations';
 import { CyclePrediction } from '../types';
 import { fromISODate, addDaysISO } from './date';
 
@@ -22,10 +23,12 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   return requested.granted;
 }
 
-async function ensureAndroidChannel(): Promise<void> {
+type NotificationStrings = Translations['notifications'];
+
+async function ensureAndroidChannel(strings: NotificationStrings): Promise<void> {
   if (Platform.OS !== 'android') return;
   await Notifications.setNotificationChannelAsync(ANDROID_CHANNEL_ID, {
-    name: 'Döngü Hatırlatmaları',
+    name: strings.channelName,
     importance: Notifications.AndroidImportance.DEFAULT,
   });
 }
@@ -35,9 +38,12 @@ async function ensureAndroidChannel(): Promise<void> {
  * based on the latest prediction. Safe to call whenever the prediction
  * changes (new period day logged, settings edited, etc).
  */
-export async function scheduleCycleNotifications(prediction: CyclePrediction): Promise<void> {
+export async function scheduleCycleNotifications(
+  prediction: CyclePrediction,
+  strings: NotificationStrings
+): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
-  await ensureAndroidChannel();
+  await ensureAndroidChannel(strings);
 
   const now = Date.now();
 
@@ -47,8 +53,8 @@ export async function scheduleCycleNotifications(prediction: CyclePrediction): P
     if (reminderDate.getTime() > now) {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: 'Adet döneminiz yaklaşıyor',
-          body: 'Tahmini adet başlangıcınıza 2 gün kaldı.',
+          title: strings.periodTitle,
+          body: strings.periodBody,
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
@@ -65,8 +71,8 @@ export async function scheduleCycleNotifications(prediction: CyclePrediction): P
     if (reminderDate.getTime() > now) {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: 'Yumurtlama döneminiz yaklaşıyor',
-          body: 'Tahmini yumurtlama gününüze 1 gün kaldı.',
+          title: strings.ovulationTitle,
+          body: strings.ovulationBody,
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,

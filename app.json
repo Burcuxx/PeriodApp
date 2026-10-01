@@ -27,7 +27,8 @@
         {
           "color": "#B565A7"
         }
-      ]
+      ],
+      "expo-localization"
     ]
   }
 }
