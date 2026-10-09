@@ -73,6 +73,8 @@ const en = {
     notEnoughData: 'Not enough data yet. Once you log more than one cycle, your history will appear here.',
     pastPeriods: 'Past periods',
     noPeriodDays: 'No period days logged yet.',
+    periodRange: (range: string, length: string) => `${range}, ${length}`,
+    sliderPage: (page: number, total: number) => `Page ${page} of ${total}`,
   },
   settings: {
     title: 'Settings',
@@ -167,6 +169,8 @@ const tr: Translations = {
     notEnoughData: 'Henüz yeterli veri yok. Birden fazla döngü kaydettiğinde burada geçmişini göreceksin.',
     pastPeriods: 'Geçmiş adet dönemleri',
     noPeriodDays: 'Henüz kayıtlı adet günü yok.',
+    periodRange: (range: string, length: string) => `${range}, ${length}`,
+    sliderPage: (page: number, total: number) => `Sayfa ${page} / ${total}`,
   },
   settings: {
     title: 'Ayarlar',
@@ -261,6 +265,8 @@ const fr: Translations = {
       "Pas encore assez de données. Dès que tu auras enregistré plusieurs cycles, ton historique apparaîtra ici.",
     pastPeriods: 'Règles précédentes',
     noPeriodDays: 'Aucun jour de règles enregistré pour le moment.',
+    periodRange: (range: string, length: string) => `${range}, ${length}`,
+    sliderPage: (page: number, total: number) => `Page ${page} sur ${total}`,
   },
   settings: {
     title: 'Réglages',
@@ -356,6 +362,8 @@ const de: Translations = {
       'Noch nicht genug Daten. Sobald du mehr als einen Zyklus erfasst hast, siehst du hier deinen Verlauf.',
     pastPeriods: 'Vergangene Perioden',
     noPeriodDays: 'Noch keine Periodentage erfasst.',
+    periodRange: (range: string, length: string) => `${range}, ${length}`,
+    sliderPage: (page: number, total: number) => `Seite ${page} von ${total}`,
   },
   settings: {
     title: 'Einstellungen',

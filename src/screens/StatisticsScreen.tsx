@@ -3,8 +3,9 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../components/Card';
 import { CycleBarChart } from '../components/CycleBarChart';
+import { GridSlider } from '../components/GridSlider';
 import { useAppData } from '../context/AppContext';
-import { colors, spacing, typography } from '../theme/theme';
+import { colors, radius, spacing, typography } from '../theme/theme';
 import { useI18n } from '../i18n';
 import { diffInDays } from '../utils/date';
 import { groupPeriodDays } from '../utils/cyclePredictor';
@@ -23,7 +24,11 @@ export function StatisticsScreen() {
     return lengths.slice(-8);
   }, [groups]);
 
-  const recentPeriods = [...groups].reverse().slice(0, 6);
+  const recentPeriods = [...groups].reverse().slice(0, 12);
+
+  const formatRange = (group: (typeof groups)[number]) =>
+    formatDate(group.startDate) +
+    (group.startDate !== group.endDate ? ` – ${formatDate(group.endDate)}` : '');
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -54,15 +59,22 @@ export function StatisticsScreen() {
           {recentPeriods.length === 0 && (
             <Text style={typography.bodyMuted}>{t.statistics.noPeriodDays}</Text>
           )}
-          {recentPeriods.map((group) => (
-            <View key={group.startDate} style={styles.historyRow}>
-              <Text style={typography.body}>
-                {formatDate(group.startDate)}
-                {group.startDate !== group.endDate ? ` – ${formatDate(group.endDate)}` : ''}
-              </Text>
-              <Text style={typography.bodyMuted}>{t.common.days(group.length)}</Text>
-            </View>
-          ))}
+          <GridSlider
+            data={recentPeriods}
+            rows={2}
+            columnsPerView={2}
+            keyExtractor={(group) => group.startDate}
+            itemAccessibilityLabel={(group) =>
+              t.statistics.periodRange(formatRange(group), t.common.days(group.length))
+            }
+            pageAccessibilityLabel={t.statistics.sliderPage}
+            renderItem={(group) => (
+              <View style={styles.periodTile}>
+                <Text style={typography.body}>{formatRange(group)}</Text>
+                <Text style={typography.bodyMuted}>{t.common.days(group.length)}</Text>
+              </View>
+            )}
+          />
         </Card>
       </ScrollView>
     </SafeAreaView>
@@ -103,11 +115,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     gap: spacing.sm,
   },
-  historyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+  periodTile: {
+    flex: 1,
+    gap: spacing.xs,
+    padding: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMuted,
   },
 });
